@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Me - Full Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* ==================== Cấu hình chung ==================== */
+        * {
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Ẩn nội dung chính khi đang loading */
+        .main-content {
+            opacity: 0;
+            transform: translateY(20px);
+            width: 100%;
+            max-width: 900px;
+            padding: 20px;
+        }
+
+        /* Hiệu ứng hiển thị sau khi load xong */
+        .content-loaded {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ==================== Hiệu ứng Vòng Tròn Loading ==================== */
+        .loading-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        .circle-loader {
+            width: 180px;
+            height: 180px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4caf50; /* Màu xanh lá chạy vòng quanh */
+            border-radius: 50%;
+            animation: spin 1.5s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ==================== Khung Header Ngoài Container ==================== */
+        .top-header {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .top-header h1 {
+            color: #1e88e5;
+            font-size: 34px;
+            margin: 0;
+            font-weight: 500;
+        }
+        .top-header p {
+            font-size: 13px;
+            color: #757575;
+            margin: 5px 0 20px;
+        }
+
+        /* ==================== Khung Profile Xám ==================== */
+        .profile-card {
+            background-color: #f0f4f8;
+            border-radius: 12px;
+            padding: 35px 20px;
+            text-align: center;
+            width: 100%;
+        }
+
+        /* Avatar và Tích xanh */
+        .avatar-container {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 15px;
+        }
+        .avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #ffffff;
+        }
+        .blue-badge {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background-color: #1e88e5;
+            color: white;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            border: 2px solid #ffffff;
+        }
+
+        /* Chữ Verify xanh lá */
+        .verify-text {
+            color: #4caf50;
+            font-size: 15px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .verify-text i { margin-right: 5px; }
+
+        /* Tên & Subtitle */
+        .name {
+            color: #1e88e5;
+            font-size: 26px;
+            margin: 5px 0;
+        }
+        .description {
+            color: #1e88e5;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        hr {
+            border: 0;
+            border-top: 1px solid #d1d9e0;
+            margin: 25px 0;
+        }
+
+        /* Chia 2 cột thông tin */
+        .info-grid {
+            display: flex;
+            justify-content: space-around;
+            text-align: left;
+        }
+        .info-column {
+            width: 40%;
+        }
+        .info-column h3 {
+            color: #1e88e5;
+            font-size: 18px;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+        .info-list {
+            list-style: none;
+            padding: 0; margin: 0;
+        }
+        .info-list li {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+        }
+        .info-list li i {
+            width: 25px;
+            color: #555;
+        }
+        .info-list a {
+            color: #333;
+            text-decoration: none;
+        }
+        .info-list a:hover {
+            color: #1e88e5;
+            text-decoration: underline;
+        }
+
+        /* Nút Liên Hệ */
+        .btn-contact {
+            background-color: #1e88e5;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .btn-contact:hover {
+            background-color: #1565c0;
+            box-shadow: 0 4px 10px rgba(30,136,229,0.3);
+        }
+
+        /* ==================== Khối "My Story" (Kéo xuống dưới) ==================== */
+        .story-section {
+            margin-top: 50px;
+            width: 100%;
+            text-align: center;
+        }
+        .story-title {
+            color: #4caf50;
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        .tech-logo {
+            font-size: 50px;
+            color: #333333;
+            margin-bottom: 30px;
+        }
+
+        /* Khối bài viết lật cạnh */
+        .story-row {
+            display: flex;
+            margin-bottom: 40px;
+            align-items: center;
+            text-align: left;
+            gap: 30px;
+        }
+        .story-img-box {
+            width: 40%;
+        }
+        .story-img-box img {
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .story-text-box {
+            width: 60%;
+        }
+        .story-text-box h4 {
+            font-size: 20px;
+            color: #333;
+            margin: 0 0 10px 0;
+        }
+        .story-text-box p {
+            color: #666;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+        .thank-you-tag {
+            color: #e91e63;
+            font-size: 12px;
+            display: block;
+            text-align: right;
+            margin-top: 10px;
+        }
+
+        /* ==================== RESPONSIVE (Tự tối ưu trên Điện thoại) ==================== */
+        @media (max-width: 768px) {
+            /* Gom 2 cột thông tin thành 1 cột */
+            .info-grid {
+                flex-direction: column;
+                align-items: center;
+            }
+            .info-column {
+                width: 100%;
+                text-align: center;
+                margin-bottom: 20px;
+            }
+            .info-list li {
+                justify-content: center;
+            }
+
+            /* Gom khối My Story thành hàng dọc xếp chồng */
+            .story-row {
+                flex-direction: column;
+                text-align: center;
+            }
+            .story-img-box, .story-text-box {
+                width: 100%;
+            }
+            .thank-you-tag {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="loading-overlay" id="loader">
+        <div class="circle-loader"></div>
+    </div>
+
+    <div class="main-content" id="content">
+        
+        <div class="top-header">
+            <h1>About Me</h1>
+            <p>Updated 20 minutes ago</p>
+        </div>
+
+        <div class="profile-card">
+            <div class="avatar-container">
+                <img src="https://via.placeholder.com/150" alt="Avatar" class="avatar">
+                <div class="blue-badge">
+                    <i class="fas fa-check"></i>
+                </div>
+            </div>
+
+            <div class="verify-text">
+                <i class="fas fa-check-circle"></i> Verify
+            </div>
+
+            <h2 class="name">Lưu Minh Thông <i class="fas fa-heartbeat fa-pulse"></i></h2>
+            <p class="description">Description about me !</p>
+
+            <hr>
+
+            <div class="info-grid">
+                <div class="info-column">
+                    <h3>Công việc</h3>
+                    <ul class="info-list">
+                        <li><i class="fas fa-globe"></i><a href="#">AnonyViet.com</a></li>
+                        <li><i class="fas fa-dollar-sign"></i><a href="#">Vnurl.info</a></li>
+                    </ul>
+                </div>
+                <div class="info-column">
+                    <h3>Thông tin liên lạc</h3>
+                    <ul class="info-list">
+                        <li><i class="fas fa-paper-plane"></i><a href="mailto:boss@anonyviet.com">boss@anonyviet.com</a></li>
+                        <li><i class="fab fa-facebook-f"></i><a href="#">fb.com/anonyvietdotcom</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <button class="btn-contact"><i class="fas fa-user-plus"></i> LIÊN HỆ TÔI</button>
+        </div>
+
+        <div class="story-section">
+            <div class="story-title">
+                My Story <i class="fas fa-bookmark"></i>
+            </div>
+            
+            <div class="tech-logo">
+                <i class="fab fa-js-square"></i>
+            </div>
+
+            <div class="story-row">
+                <div class="story-img-box">
+                    <img src="https://via.placeholder.com/350x200" alt="Story 1">
+                </div>
+                <div class="story-text-box">
+                    <h4>Đời lập trình của tôi bắt đầu bằng sự tình cờ...</h4>
+                    <p>Lmint là biệt danh đầu tiên và cũng là duy nhất của mình. Khi còn là cậu học sinh lớp 10 ngu ngơ, mình đã gặp anh Quang. Người đã thay đổi cuộc đời mình theo chiều hướng tích cực hơn. Biến mình từ một người không biết gì suốt ngày máy tính trở thành một lập trình viên như hôm nay...</p>
+                    <span class="thank-you-tag">Thank for watching <i class="fas fa-heart"></i></span>
+                </div>
+            </div>
+
+            <div class="story-row">
+                <div class="story-img-box">
+                    <img src="https://via.placeholder.com/350x200" alt="Story 2">
+                </div>
+                <div class="story-text-box">
+                    <h4>Lời hứa của tôi với bản thân và mọi người trong hai năm qua...</h4>
+                    <p>Trong suốt hai năm qua, tôi cảm thấy mình chưa có tiến triển gì nhiều trong công việc lẫn học tập. Cảm thấy mình cần bổ sung nhiều kiến thức hơn, có trách nhiệm hơn trong công việc và lời hứa. Gần đây, website đã bước sang giai đoạn phát triển, thành viên trong đội ngũ đã có nhiều ưu tú từ tôi và các Admin khác...</p>
+                    <span class="thank-you-tag">Thank for watching <i class="fas fa-heart"></i></span>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                const loader = document.getElementById('loader');
+                const content = document.getElementById('content');
+                
+                // Ẩn loader biến mất mượt mà
+                loader.style.opacity = '0';
+                setTimeout(() => loader.style.display = 'none', 300);
+                
+                // Hiển thị nội dung web
+                content.classList.add('content-loaded');
+            }, 2500); // 2500ms = 2.5 giây chờ tải (bạn có thể chỉnh lại thời gian tại đây)
+        });
+    </script>
+
+</body>
+</html>
+</html>
+</html>
